@@ -7,7 +7,60 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.monument {
+  /* border: 1px #d5d5d5 solid; */
+  /* max-height: 400px; */
+  height: 330px;
+  /* width: 300px; */
+  text-align: center;
+  max-width: 300px;
+  margin: 0 10px;
+}
+
+.card-img-top {
+  /* min-height: 100px;
+  min-width: 100px; */
+  width: 100%;
+  height: 174.84px;
+}
+
+.monument-name-link,
+.monument-name-link:hover {
+  text-decoration: none;
+  color: #333;
+}
+
+.galleria {
+  width: 100%;
+}
+
+.galleria-item {
+  width: 393px;
+  height: 393px;
+}
+
+.galleria-thumbnail {
+  width: 78px;
+  height: 78px;
+}
+
+.infoBox {
+  margin-top: 20px;
+  border-radius: 6px;
+  background-color: #f4f6f9;
+  padding: 20px;
+  font-size: 18px;
+}
+
+.icon-size {
+  font-size: 22px;
+}
+
+.text-placement {
+  margin-left: 5px;
+}
+
+.map-container {
+  height: 100%;
+  width: 100%;
 }
