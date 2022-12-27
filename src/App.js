@@ -13,8 +13,29 @@ import { MonumentDetails } from './views/MonumentDetails';
 import 'primereact/resources/themes/lara-light-indigo/theme.css'; //theme
 import 'primereact/resources/primereact.min.css'; //core css
 import 'primeicons/primeicons.css'; //icons
+import { useEffect, useState } from 'react';
+
 
 function App() {
+  const [monuments, setMonuments] = useState(null);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { data } = await axios.get(
+          'http://localhost:8080/Projet1WebWS/monuments'
+        );
+        setMonuments(data);
+      } catch (err) {
+        console.log("Error retrieve");
+      }
+    };
+    fetchData();
+  }, []);
+
+  if(monuments == null) {
+    return;
+  }
+
   return (
     <BrowserRouter>
       <header>
@@ -30,7 +51,7 @@ function App() {
         <Container className="mt-3">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/monument/:id" element={<MonumentDetails />} />
+            <Route path="/monument/:id" element={<MonumentDetails monuments={monuments} />} />
           </Routes>
         </Container>
       </main>

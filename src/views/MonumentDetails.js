@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useMemo } from 'react';
+import React, { useEffect, useReducer, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import LoadingBox from '../components/LoadingBox';
 import MessageBox from '../components/MessageBox';
@@ -14,6 +14,7 @@ import { VscPerson } from 'react-icons/vsc';
 import { BiCommentDetail } from 'react-icons/bi';
 import { GoogleMap, useLoadScript, MarkerF } from '@react-google-maps/api';
 import moment from 'moment';
+import { Monument } from '../components/Monument';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -23,6 +24,8 @@ const reducer = (state, action) => {
       return { ...state, loading: false, monument: action.payload };
     case 'FETCH_FAIL':
       return { ...state, loading: false, error: action.payload };
+    case 'FILTER_SUCCESS':
+      return { ...state, closeMonuments: action.payload };
     default:
       return state;
   }
@@ -65,9 +68,10 @@ const thumbnailTemplate = (item) => {
   );
 };
 
-export const MonumentDetails = () => {
-  const [{ loading, error, monument }, dispatch] = useReducer(reducer, {
+export const MonumentDetails = ({monuments}) => {
+  const [{ loading, error, monument, closeMonuments }, dispatch] = useReducer(reducer, {
     monument: null,
+    closeMonuments: monuments,
     loading: true,
     error: '',
   });
@@ -92,6 +96,11 @@ export const MonumentDetails = () => {
     };
     fetchData();
   }, [id]);
+
+  useEffect(() => {
+    if(monument != null)
+    dispatch({type: 'FILTER_SUCCESS', payload: monuments.filter(m => m.id != monument.id && CheckDistanceBetweenTwoLocations({latitude: monument.latitude, longitude: monument.longitude}, {latitude: m.latitude, longitude: m.longitude}))});
+  }, [monument, monuments]);
 
   return loading ? (
     <LoadingBox></LoadingBox>
@@ -151,6 +160,14 @@ export const MonumentDetails = () => {
           </span>
         </div>
       </div>
+      <Row className="my-3">
+        {closeMonuments.length > 0 && <h3 style={{marginBottom: '20px'}}>Monuments proches</h3>}
+            {closeMonuments.map((m) => (
+              <Col sm={6} md={4} lg={3} className="mb-3" key={m.id}>
+                <Monument monument={m} />
+              </Col>
+            ))}
+      </Row>
     </div>
   );
 };
@@ -163,4 +180,30 @@ function Map({ lt, lg }) {
       <MarkerF position={center} />
     </GoogleMap>
   );
+}
+
+function CheckDistanceBetweenTwoLocations(location1, location2) {
+  // Convert the latitudes and longitudes to radians
+  const lat1 = toRadians(location1.latitude);
+  const lon1 = toRadians(location1.longitude);
+  const lat2 = toRadians(location2.latitude);
+  const lon2 = toRadians(location2.longitude);
+
+  // Calculate the distance using the Haversine formula
+  const EARTH_RADIUS = 6371; // Earth's radius in kilometers
+  const distance =
+    2 *
+    EARTH_RADIUS *
+    Math.asin(
+      Math.sqrt(
+        Math.pow(Math.sin((lat2 - lat1) / 2), 2) +
+          Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin((lon2 - lon1) / 2), 2)
+      )
+    );
+
+  return distance <= 10;
+}
+
+function toRadians(degrees) {
+  return (degrees * Math.PI) / 180;
 }
